@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A1 → A2 Seviye Testi · Esracademia</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --red:#B52A2A; --dark:#141414; --cream:#FAF7F4; --border:#E5DED8; --mid:#8C7B72; }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);min-height:100vh;}
+  #progress-bar-wrap{position:fixed;top:0;left:0;right:0;height:3px;background:var(--border);z-index:100;display:none;}
+  #progress-bar{height:100%;background:var(--red);transition:width .4s ease;width:0%;}
+  .screen{display:none;min-height:100vh;padding:60px 24px;max-width:720px;margin:0 auto;}
+  .screen.active{display:block;}
+  .brand{display:flex;align-items:center;margin-bottom:48px;}
+  .brand-logo{display:none;}
+  .brand-name{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;font-style:normal;letter-spacing:-0.2px;line-height:1;}
+  .brand-name .esra{color:rgba(20,20,20,0.4);}
+  .brand-name .cademia{color:#B52A2A;}
+  .eyebrow{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--red);margin-bottom:16px;font-weight:600;}
+  h1{font-family:'Playfair Display',serif;font-size:clamp(36px,7vw,60px);line-height:1.1;margin-bottom:24px;}
+  h1 em{font-style:italic;color:var(--red);}
+  .subtitle{font-size:16px;line-height:1.7;color:var(--mid);margin-bottom:40px;max-width:480px;}
+  .meta-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:48px;}
+  .meta-item{border:1px solid var(--border);border-radius:8px;padding:16px 20px;background:white;}
+  .meta-item .label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);margin-bottom:4px;}
+  .meta-item .value{font-size:15px;font-weight:500;}
+  .name-block{margin-bottom:32px;}
+  .name-block label{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--mid);margin-bottom:8px;font-weight:500;}
+  .name-block input{width:100%;padding:14px 18px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:15px;background:white;color:var(--dark);outline:none;transition:border-color .2s;}
+  .name-block input:focus{border-color:var(--red);}
+  .name-block input::placeholder{color:#C8BEB8;}
+  .btn-primary{display:inline-flex;align-items:center;gap:10px;background:var(--red);color:white;border:none;border-radius:8px;padding:16px 32px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .2s,transform .15s;letter-spacing:.02em;}
+  .btn-primary:hover{opacity:.9;transform:translateY(-1px);}
+  .btn-outline{display:inline-flex;align-items:center;gap:10px;background:transparent;color:var(--dark);border:1.5px solid var(--border);border-radius:8px;padding:14px 28px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:border-color .2s,background .2s;}
+  .btn-outline:hover{border-color:var(--dark);background:white;}
+  .section-header{margin-bottom:40px;}
+  .section-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:var(--red);margin-bottom:12px;}
+  .section-tag span{width:18px;height:18px;background:var(--red);color:white;border-radius:50%;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;letter-spacing:0;}
+  .section-header h2{font-family:'Playfair Display',serif;font-size:clamp(24px,5vw,36px);line-height:1.2;margin-bottom:8px;}
+  .section-header p{font-size:14px;color:var(--mid);}
+  .question-block{margin-bottom:28px;padding:24px;background:white;border:1px solid var(--border);border-radius:10px;transition:border-color .2s;}
+  .question-block.answered{border-color:#C8E6C9;}
+  .passage-box{font-size:13px;line-height:1.75;color:#4A3F3A;background:var(--cream);border-left:3px solid var(--red);padding:14px 18px;border-radius:0 6px 6px 0;margin-bottom:20px;font-style:italic;}
+  .q-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .q-number{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);font-weight:600;}
+  .q-topic{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--red);font-weight:500;}
+  .q-text{font-size:15px;line-height:1.6;margin-bottom:18px;}
+  .options{display:flex;flex-direction:column;gap:8px;}
+  .option{display:flex;align-items:center;gap:12px;padding:12px 16px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;transition:all .15s;font-size:14px;color:var(--dark);background:white;text-align:left;width:100%;font-family:'DM Sans',sans-serif;}
+  .option:hover{border-color:var(--dark);background:var(--cream);}
+  .option.selected{border-color:var(--dark);background:var(--dark);color:white;font-weight:500;}
+  .option-letter{width:22px;height:22px;border:1.5px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;color:var(--mid);}
+  .option.selected .option-letter{border-color:rgba(255,255,255,0.5);color:white;}
+  .nav-row{display:flex;align-items:center;justify-content:space-between;margin-top:40px;padding-top:32px;border-top:1px solid var(--border);}
+  .nav-info{font-size:13px;color:var(--mid);}
+  .nav-right{display:flex;gap:12px;align-items:center;}
+  #screen-results{text-align:center;}
+  .result-hero{display:inline-flex;flex-direction:column;align-items:center;border:1.5px solid var(--border);border-radius:16px;background:white;padding:36px 48px;margin-bottom:28px;min-width:220px;}
+  .result-hero-score{font-family:'Playfair Display',serif;font-size:64px;font-weight:700;line-height:1;color:var(--dark);}
+  .result-hero-denom{font-size:18px;color:var(--mid);margin-bottom:16px;}
+  .result-hero-divider{width:40px;height:1.5px;background:var(--border);margin:0 auto 16px;}
+  .result-hero-level{display:inline-block;background:var(--dark);color:white;font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:6px 16px;border-radius:20px;}
+  .result-name{font-size:13px;color:var(--mid);letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px;}
+  .result-title{font-family:'Playfair Display',serif;font-size:clamp(22px,4vw,30px);margin-bottom:10px;line-height:1.3;}
+  .result-hint{font-size:14px;color:var(--mid);line-height:1.7;max-width:380px;margin:0 auto 40px;}
+  .section-scores{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:40px;text-align:left;}
+  .score-card{border:1px solid var(--border);border-radius:8px;padding:16px 18px;background:white;}
+  .score-card .sc-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--mid);margin-bottom:4px;}
+  .score-card .sc-val{font-size:18px;font-weight:600;}
+  .score-card .sc-bar{height:3px;background:var(--border);border-radius:2px;margin-top:8px;overflow:hidden;}
+  .score-card .sc-fill{height:100%;background:var(--red);border-radius:2px;}
+  .dm-box{border:1.5px solid var(--border);border-radius:12px;padding:32px;background:white;margin-bottom:24px;text-align:left;}
+  .dm-eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--red);font-weight:600;margin-bottom:10px;}
+  .dm-box h3{font-family:'Playfair Display',serif;font-size:20px;margin-bottom:10px;line-height:1.3;}
+  .dm-box p{font-size:14px;color:var(--mid);line-height:1.75;margin-bottom:24px;}
+  .btn-instagram{display:inline-flex;align-items:center;gap:12px;background:var(--dark);color:white;border:none;border-radius:8px;padding:16px 28px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;text-decoration:none;transition:opacity .2s,transform .15s;width:100%;justify-content:center;}
+  .btn-instagram:hover{opacity:.85;transform:translateY(-1px);}
+  .footer-note{font-size:13px;color:var(--mid);line-height:1.7;text-align:center;font-weight:500;}
+  /* ── TABLET (481–768px) ── */
+  @media(max-width:768px){
+    .screen{padding:48px 20px;}
+    h1{font-size:clamp(30px,6vw,48px);}
+    .result-hero{padding:30px 36px;}
+    .result-hero-score{font-size:56px;}
+    .btn-primary{padding:14px 24px;font-size:14px;}
+    .btn-outline{padding:12px 20px;font-size:13px;}
+    .question-block{padding:20px;}
+    .dm-box{padding:24px;}
+  }
+
+  /* ── MOBİL (max 480px) ── */
+  @media(max-width:480px){
+    .screen{padding:32px 14px;}
+    h1{font-size:clamp(26px,8vw,36px);}
+    .subtitle{font-size:14px;}
+    .meta-grid{grid-template-columns:1fr;}
+    .meta-item{padding:12px 16px;}
+    .section-scores{grid-template-columns:1fr;}
+    .nav-row{flex-wrap:wrap;gap:10px;}
+    .nav-right{width:100%;justify-content:flex-end;}
+    .btn-primary{width:100%;justify-content:center;padding:15px 20px;font-size:14px;}
+    .btn-outline{padding:12px 18px;font-size:13px;}
+    .result-hero{padding:24px 20px;min-width:unset;width:100%;max-width:280px;}
+    .result-hero-score{font-size:48px;}
+    .question-block{padding:16px 14px;margin-bottom:20px;}
+    .q-text{font-size:14px;}
+    .option{font-size:13px;padding:11px 12px;gap:10px;}
+    .option-letter{width:20px;height:20px;font-size:10px;}
+    .dm-box{padding:20px 16px;}
+    .dm-box h3{font-size:17px;}
+    .dm-box p{font-size:13px;}
+    .btn-instagram{padding:14px 20px;font-size:14px;width:100%;justify-content:center;}
+    .score-card{padding:12px 14px;}
+    .brand{margin-bottom:32px;}
+    #student-name{font-size:16px;}
+  }
+</style>
+</head>
+<body>
+<div id="progress-bar-wrap"><div id="progress-bar"></div></div>
+
+<!-- WELCOME -->
+<div id="screen-welcome" class="screen active">
+  <div class="brand"><div class="brand-name"><span class="esra">esra</span><span class="cademia">cademia</span></div></div>
+  <p class="eyebrow">Nivel A1 → A2</p>
+  <h1>A2 seviye İspanyolca için <em>hazır mısın?</em></h1>
+  <p class="subtitle">50 soruluk bu test ile A1 seviyeni ne kadar pekiştirdiğini ölçelim. Sonuçlarını anında göreceksin.</p>
+  <div class="meta-grid">
+    <div class="meta-item"><div class="label">Soru sayısı</div><div class="value">50 soru</div></div>
+    <div class="meta-item"><div class="label">Süre</div><div class="value">~20 dakika</div></div>
+    <div class="meta-item"><div class="label">Beceri Alanları</div><div class="value">Gramática, Vocabulario,<br>Comprensión, Comunicación</div></div>
+    <div class="meta-item"><div class="label">Sonuç</div><div class="value">Anında görürsün</div></div>
+  </div>
+  <div class="name-block">
+    <label>Adın ve Soyadın</label>
+    <input type="text" id="student-name" placeholder="Adını ve soyadını yaz..." maxlength="50" oninput="document.getElementById('name-error').style.display='none';this.style.borderColor='var(--border)'">
+    <p id="name-error" style="display:none;color:var(--red);font-size:12px;margin-top:6px;font-weight:500;">Ad ve soyad zorunludur.</p>
+  </div>
+  <div class="kvkk-block">
+    <input type="checkbox" id="kvkk-consent">
+    <label for="kvkk-consent">Test sonucumun değerlendirilmesi amacıyla adımın işlenmesine onay veriyorum.</label>
+  </div>
+  <p id="kvkk-error">Devam etmek için onay vermeniz gerekiyor.</p>
+  <button class="btn-primary" onclick="startTest()">Testi Başlat <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+</div>
+
+<!-- S1 -->
+<div id="screen-s1" class="screen">
+  <div class="brand"><div class="brand-name"><span class="esra">esra</span><span class="cademia">cademia</span></div></div>
+  <div class="section-header"><div class="section-tag"><span>1</span> Bölüm 1 / 4</div><h2>Gramática</h2><p>12 soru · Dilbilgisi</p></div>
+  <div id="questions-s1"></div>
+  <div class="nav-row">
+    <div class="nav-info" id="nav-info-s1"></div>
+    <div class="nav-right"><button class="btn-primary" onclick="nextSection(1)">Sonraki Bölüm <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+  </div>
+</div>
+
+<!-- S2 -->
+<div id="screen-s2" class="screen">
+  <div class="brand"><div class="brand-name"><span class="esra">esra</span><span class="cademia">cademia</span></div></div>
+  <div class="section-header"><div class="section-tag"><span>2</span> Bölüm 2 / 4</div><h2>Vocabulario</h2><p>12 soru · Kelime bilgisi</p></div>
+  <div id="questions-s2"></div>
+  <div class="nav-row">
+    <button class="btn-outline" onclick="prevSection(2)"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M13 8H3M7 4L3 8l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Geri</button>
+    <div class="nav-right"><div class="nav-info" id="nav-info-s2"></div><button class="btn-primary" onclick="nextSection(2)">Sonraki Bölüm <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+  </div>
+</div>
+
+<!-- S3 -->
+<div id="screen-s3" class="screen">
+  <div class="brand"><div class="brand-name"><span class="esra">esra</span><span class="cademia">cademia</span></div></div>
+  <div class="section-header"><div class="section-tag"><span>3</span> Bölüm 3 / 4</div><h2>Comprensión</h2><p>13 soru · Okuma anlama</p></div>
+  <div id="questions-s3"></div>
+  <div class="nav-row">
+    <button class="btn-outline" onclick="prevSection(3)"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M13 8H3M7 4L3 8l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Geri</button>
+    <div class="nav-right"><div class="nav-info" id="nav-info-s3"></div><button class="btn-primary" onclick="nextSection(3)">Sonraki Bölüm <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+  </div>
+</div>
+
+<!-- S4 -->
+<div id="screen-s4" class="screen">
+  <div class="brand"><div class="brand-name"><span class="esra">esra</span><span class="cademia">cademia</span></div></div>
+  <div class="section-header"><div class="section-tag"><span>4</span> Bölüm 4 / 4</div><h2>Comunicación</h2><p>13 soru · İletişim becerileri</p></div>
+  <div id="questions-s4"></div>
+  <div class="nav-row">
+    <button class="btn-outline" onclick="prevSection(4)"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M13 8H3M7 4L3 8l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Geri</button>
+    <div class="nav-right"><div class="nav-info" id="nav-info-s4"></div><button class="btn-primary" onclick="submitTest()">Sonucu Gör <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a6 6 0 100 12A6 6 0 008 2zm0 9l-3-3 1.4-1.4L8 8.2l3.6-3.6L13 6l-5 5z" fill="white"/></svg></button></div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="screen-results" class="screen">
+  <div class="brand" style="justify-content:center;margin-bottom:24px;"><div class="brand-name" style="font-size:17px;"><span class="esra">esra</span><span class="cademia">cademia</span></div></div>
+  <p class="result-name" id="result-name"></p>
+  <div class="celebration" id="celebration">
+    <div class="celebration-emoji">🎉</div>
+    <div class="celebration-text">A2'ye hazırsın!</div>
+  </div>
+  <p class="a2-badge" id="a2-badge">🎉 A2'ye hazırsın!</p>
+  <h2 id="result-title" style="font-family:'Playfair Display',serif;font-size:clamp(20px,4vw,28px);margin-bottom:8px;line-height:1.3;"></h2>
+  <p id="result-hint" style="font-size:14px;color:var(--mid);line-height:1.7;max-width:380px;margin:0 auto 20px;"></p>
+  <div style="display:flex;justify-content:center;">
+    <div class="result-hero">
+      <div style="font-size:13px;color:var(--mid);margin-bottom:4px;letter-spacing:.03em;">50 sorudan</div>
+      <div class="result-hero-score" id="result-total">—</div>
+      <div style="font-size:15px;color:var(--mid);margin-top:4px;">doğru cevap</div>
+      <div style="margin-top:16px;width:40px;height:1.5px;background:rgba(255,255,255,0.3);margin-left:auto;margin-right:auto;"></div>
+      <div id="result-level" style="margin-top:12px;display:inline-block;background:var(--dark);color:white;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:5px 14px;border-radius:20px;">—</div>
+    </div>
+  </div>
+  <div class="section-scores">
+    <div class="score-card"><div class="sc-label">Gramática</div><div class="sc-val" id="sc-gram">—</div><div class="sc-bar"><div class="sc-fill" id="sc-gram-bar"></div></div></div>
+    <div class="score-card"><div class="sc-label">Vocabulario</div><div class="sc-val" id="sc-voc">—</div><div class="sc-bar"><div class="sc-fill" id="sc-voc-bar"></div></div></div>
+    <div class="score-card"><div class="sc-label">Comprensión</div><div class="sc-val" id="sc-comp">—</div><div class="sc-bar"><div class="sc-fill" id="sc-comp-bar"></div></div></div>
+    <div class="score-card"><div class="sc-label">Comunicación</div><div class="sc-val" id="sc-com">—</div><div class="sc-bar"><div class="sc-fill" id="sc-com-bar"></div></div></div>
+  </div>
+  <div class="dm-box" id="dm-box">
+    <div class="dm-eyebrow">BİR SONRAKİ ADIM</div>
+    <h3 id="dm-title"></h3>
+    <p id="dm-text"></p>
+    <div class="copy-box">
+      <div class="copy-box-label">DM'e kopyala</div>
+      <div class="copy-box-text" id="copy-text">—</div>
+      <button class="btn-copy" onclick="copyDM(this)">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M3 11H2a1 1 0 01-1-1V2a1 1 0 011-1h8a1 1 0 011 1v1" stroke="currentColor" stroke-width="1.5"/></svg>
+        Metni kopyala
+      </button>
+    </div>
+    <a href="https://ig.me/m/esracademia" target="_blank" class="btn-instagram">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="white" stroke="none"/></svg>
+      @esracademia'ya DM gönder
+    </a>
+  </div>
+  <p class="footer-note">Test sonucunu bana yaz. Bir sonraki adımları birlikte planlayalım.</p>
+</div>
+
+<script>
+const SECTIONS = [
+
+  { id:'s1', name:'Gramática', total:12, questions:[
+    { topic:'Ser – Estar',         q:'Yo ___ estudiante.',                                             opts:['estoy','tengo','soy'],           ans:2 },
+    { topic:'Ser – Estar',         q:'Hoy María ___ enferma.',                                        opts:['es','está','tiene'],             ans:1 },
+    { topic:'El género',           q:'¿Cuál es correcto?',                                             opts:['el problema','la problema','el problemo'], ans:0 },
+    { topic:'La concordancia',     q:'Tengo dos hermanas muy ___.',                                    opts:['guapo','guapas','guapa'],        ans:1 },
+    { topic:'Adjetivos posesivos', q:'___ casa es muy grande. (de nosotros)',                         opts:['Nuestro','Vuestra','Nuestra'],   ans:2 },
+    { topic:'Verbos regulares',    q:'Nosotros ___ en Madrid. (vivir)',                               opts:['vivemos','vivimos','viven'],     ans:1 },
+    { topic:'Verbos irregulares',  q:'¿Tú ___ al trabajo hoy? (ir)',                                  opts:['vas','voy','van'],               ans:0 },
+    { topic:'Tener – Hay',        q:'A: ¿___ un hospital cerca de aquí? B: Sí, está en la calle Mayor.', opts:['Tienes','Hay','Está'], ans:1 },
+    { topic:'Muy – Mucho',        q:'Tengo ___ trabajo esta semana.',                               opts:['mucho','muy','mucha'],           ans:0 },
+    { topic:'Pronombres OD',       q:'¿Ves a Ana? — Sí, ___ veo.',                                   opts:['lo','le','la'],                 ans:2 },
+    { topic:'Cuantificadores',     q:'Hay ___ estudiantes en clase. Solo tres personas.',             opts:['muchos','pocos','todos'],        ans:1 },
+    { topic:'Tener que',           q:'Mañana tengo que levantarme temprano ___ ir al trabajo.',       opts:['por','para','porque'],           ans:1 }
+  ]},
+
+  { id:'s2', name:'Vocabulario', total:12, questions:[
+    { topic:'Los colores',               q:'La manzana es ___.',                                       opts:['rojo','roja','rojos'],                ans:1 },
+    { topic:'Países – Idiomas',     q:'En España hablan ___.',                                    opts:['inglés','francés','español'],         ans:2 },
+    { topic:'Nacionalidades',            q:'Soy de Turquía. Soy ___.',                                 opts:['turco','turcos','turcas'],            ans:0 },
+    { topic:'Descripción física',        q:'Mi abuela tiene 86 años. Es ___.',                         opts:['joven','mayor','alta'],               ans:1 },
+    { topic:'Vocabulario de la familia', q:'El hijo de mi padre es mi ___.',                           opts:['primo','hermano','sobrino'],          ans:1 },
+    { topic:'Lugares en la ciudad',      q:'Necesito dinero. Voy al ___.',                             opts:['hospital','banco','mercado'],         ans:1 },
+    { topic:'Los números',               q:'15 + 6 = ___',                                            opts:['veinte','veintiuno','veintidós'],     ans:1 },
+    { topic:'Las horas',                 q:'"Son las dos y media." ¿Qué hora es?',                    opts:['2:15','2:45','2:30'],                 ans:2 },
+    { topic:'Adv. de frecuencia',        q:'Como pizza ___ (solo los viernes).',                      opts:['a veces','siempre','nunca'],          ans:0 },
+    { topic:'Las horas',                 q:'Me levanto a las ___ . (7:15)',                            opts:['Siete','Siete y cuarto','Siete y media'], ans:1 },
+    { topic:'Vocabulario de la familia', q:'La madre de mi madre es mi ___.',                         opts:['tía','abuela','prima'],               ans:1 },
+    { topic:'Los días',                  q:'el lunes — ___ — el miércoles.',                opts:['el martes','el jueves','el viernes'], ans:0 }
+  ]},
+
+  { id:'s3', name:'Comprensión', total:13, questions:[
+    { topic:'Texto 1',
+      passage:'Hola, soy Ana. Tengo 25 años. Soy de España pero vivo en Estambul. Trabajo en un café. Me levanto a las 8, desayuno y voy al trabajo a pie. Por la tarde estudio turco.',
+      q:'¿Dónde vive Ana?',                                   opts:['En España','En Estambul','En Italia'],              ans:1 },
+    { topic:'Texto 1', q:'¿Cómo va Ana al trabajo?',          opts:['En metro','En coche','A pie'],                      ans:2 },
+    { topic:'Texto 1', q:'¿Qué hace Ana por la tarde?',       opts:['trabaja','estudia turco','duerme'],                 ans:1 },
+    { topic:'Texto 1', q:'A: ¿___? B: Soy profesora.',        opts:['¿Trabajas mucho?','¿Cuándo trabajas?','¿A qué te dedicas?'], ans:2 },
+    { topic:'Las preposiciones',  q:'A: ¿___? B: Hace frío.', opts:['¿Qué tiempo hace?','¿Dónde estás?','¿Qué haces?'], ans:0 },
+    { topic:'Los meses',          q:'febrero — ___ — abril.',                               opts:['enero','marzo','mayo'],               ans:1 },
+    { topic:'Las estaciones',     q:'En ___ vamos a la playa porque ___.',                            opts:['invierno / hace frío','verano / hace calor','otoño / llueve'], ans:1 },
+    { topic:'Los demostrativos',  q:'¿Cuánto cuesta ___ libro?',                                      opts:['este','estos','esta'],                ans:0 },
+    { topic:'Ser – Estar – Tener', q:'___ 85 años y ___ muy cansado hoy.',
+      opts:['Tengo / estoy','Soy / estoy','Tengo / soy'],      ans:0 },
+    { topic:'Poder',              q:'Juan está muy enfermo. No ___ ir al trabajo.',                   opts:['poder','podemos','puede'],            ans:2 },
+    { topic:'Ir en metro',        q:'Normalmente voy al trabajo ___ metro.',                          opts:['en','a','de'],                        ans:0 },
+    { topic:'Ir de',              q:'Aprendo español ___ quiero vivir en España.',                    opts:['porque','por','para'],                ans:0 },
+    { topic:'Comprensión',        q:'📩 "No puedo venir mañana." ¿Qué significa?',
+      opts:['La persona viene mañana','La persona no viene mañana','La persona llega tarde'], ans:1 }
+  ]},
+
+  { id:'s4', name:'Comunicación', total:13, questions:[
+    { topic:'Presentación personal', q:'A: ¿Cómo te llamas? B: ___',
+      opts:['Tengo 28 años.','Me llamo Carlos.','Soy de Turquía.'],                                   ans:1 },
+    { topic:'Saludos',               q:'Son las 9 de la mañana. ¿Cómo saludas?',
+      opts:['¡Buenas noches!','¡Buenas tardes!','¡Buenos días!'],                                     ans:2 },
+    { topic:'Despedidas',            q:'Te vas de la oficina. ¿Qué dices?',
+      opts:['¡Buenos días!','¡Hasta mañana!','¡Por favor!'],                                          ans:1 },
+    { topic:'Querer',                q:'Quieres saber el precio. ¿Qué preguntas?',
+      opts:['¿Cuánto cuesta?','¿Dónde está?','¿De qué color es?'],                                    ans:0 },
+    { topic:'Preferir',              q:'A: ¿Qué prefieres? B: ___ el té.',
+      opts:['Puedo','Prefiero','Tengo'],                                                               ans:1 },
+    { topic:'Presentación personal', q:'A: ¿De dónde eres? B: ___ de Turquía.',
+      opts:['Estoy','Soy','Tengo'],                                                                   ans:1 },
+    { topic:'Querer',                q:'Esta tarde ___ estudiar español. (yo)',
+      opts:['quieres','quiero','quiere'],                                                              ans:1 },
+    { topic:'Presentación personal', q:'A: ¿___? B: Tengo 28 años.',
+      opts:['¿Cómo te llamas?','¿De dónde eres?','¿Cuántos años tienes?'],                            ans:2 },
+    { topic:'Gustar – Encantar', q:'___ trabajar. (A mí)',
+      opts:['Me gusta','Te gusta','Le gusta'],                                                        ans:0 },
+    { topic:'Gustar – Encantar', q:'___ los perros. Son muy simpáticos.',
+      opts:['Me encanta','Me encantan','Te encanta'],                                                 ans:1 },
+    { topic:'Verbos irregulares',    q:'Yo ___ a las 8:00 de casa todos los días. (salir)',
+      opts:['sale','salgo','salimos'],                                                                 ans:1 },
+    { topic:'Las preposiciones',     q:'___ ir al trabajo, desayuno en casa.',
+      opts:['Antes de','Después de','Durante'],                                                       ans:0 },
+    { topic:'Adv. de frecuencia',    q:'"Como en casa todos los días." ¿Con qué frecuencia?',
+      opts:['A veces','Siempre','Casi nunca'],                                                        ans:1 }
+  ]}
+];
+
+const LEVELS = [
+  { min:0,  max:49,  label:'A1 Seviyesi',
+    title:'İyi bir başlangıç!',
+    hint:'Bazı temel konuları pekiştirmek sana çok şey katacak.',
+    dmTitle:'bekliyor',
+    dmText:'A1 seviyesinde bazı konuları daha pekiştirmen gerekiyor. A2 eğitimine hazır olman için sana yardımcı olabilirim. Sonraki adımlar için bana yaz, durumunu birlikte değerlendirelim.' },
+  { min:50, max:74,  label:'A1+ Seviyesi',
+    title:'Çok iyi gidiyorsun.',
+    hint:'Temellerin sağlam, bazı konularda biraz daha pratik gerekiyor.',
+    dmTitle:'bekliyor',
+    dmText:'Neredeyse A2 seviyesindesin ancak bazı konuları biraz daha geliştirmelisin. Sonraki adımlar için bana yaz, durumunu birlikte değerlendirelim.' },
+  { min:75, max:100, label:'A2 Seviyesi',
+    title:'Harika bir sonuç!',
+    hint:'A1 konularına çok iyi hâkimsin.',
+    dmTitle:'bekliyor',
+    dmText:'A2 için hazırsın. 18 Nisan Cumartesi başlayan A2 seviye İspanyolca eğitimine katılmak istiyor musun? Kayıt işlemine devam etmek için DM gönder.' }
+];
+
+let answers = {};
+let studentName = '';
+
+function renderSection(sec, offset) {
+  const container = document.getElementById('questions-' + sec.id);
+  container.innerHTML = '';
+  let lastPassage = null;
+  sec.questions.forEach((q, i) => {
+    const key = sec.id + '_' + i;
+    const block = document.createElement('div');
+    block.className = 'question-block' + (answers[key] !== undefined ? ' answered' : '');
+    block.id = 'qblock-' + key;
+    let passageHTML = '';
+    if (q.passage && q.passage !== lastPassage) {
+      lastPassage = q.passage;
+      passageHTML = `<div class="passage-box">${q.passage}</div>`;
+    }
+    const letters = ['A','B','C'];
+    const optsHTML = q.opts.map((opt, oi) =>
+      `<button class="option${answers[key]===oi?' selected':''}" onclick="pick('${key}',${oi},this)">
+        <span class="option-letter">${letters[oi]}</span>${opt}
+      </button>`
+    ).join('');
+    block.innerHTML = `${passageHTML}
+      <div class="q-meta"><div class="q-number">Soru ${offset+i+1}</div></div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${optsHTML}</div>`;
+    container.appendChild(block);
+  });
+}
+
+function renderAll() {
+  renderSection(SECTIONS[0], 0);
+  renderSection(SECTIONS[1], 12);
+  renderSection(SECTIONS[2], 24);
+  renderSection(SECTIONS[3], 37);
+}
+
+function pick(key, idx, btn) {
+  answers[key] = idx;
+  const block = document.getElementById('qblock-' + key);
+  block.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+  btn.classList.add('selected');
+  block.classList.add('answered');
+  document.getElementById('progress-bar').style.width = (Object.keys(answers).length / 50 * 100) + '%';
+}
+
+function navInfo(si) {
+  const s = SECTIONS[si];
+  const n = s.questions.filter((_, i) => answers[s.id+'_'+i] !== undefined).length;
+  const el = document.getElementById('nav-info-s' + (si+1));
+  if (el) el.textContent = n + ' / ' + s.total + ' cevaplandı';
+}
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function startTest() {
+  studentName = document.getElementById('student-name').value.trim();
+  if (!studentName) {
+    document.getElementById('student-name').focus();
+    document.getElementById('student-name').style.borderColor = 'var(--red)';
+    document.getElementById('name-error').style.display = 'block';
+    return;
+  }
+  document.getElementById('student-name').style.borderColor = 'var(--border)';
+  document.getElementById('name-error').style.display = 'none';
+
+  if (!document.getElementById('kvkk-consent').checked) {
+    document.getElementById('kvkk-error').style.display = 'block';
+    return;
+  }
+  document.getElementById('kvkk-error').style.display = 'none';
+  renderAll();
+  document.getElementById('progress-bar-wrap').style.display = 'block';
+  show('screen-s1'); navInfo(0);
+}
+
+function nextSection(cur) {
+  navInfo(cur - 1);
+  const s = SECTIONS[cur - 1];
+  const miss = s.questions.filter((_,i) => answers[s.id+'_'+i] === undefined).length;
+  if (miss > 0 && !confirm(miss + ' soru cevapsız. Devam etmek istiyor musun?')) return;
+  show('screen-s' + (cur + 1)); navInfo(cur);
+}
+
+function prevSection(cur) {
+  show('screen-s' + (cur - 1)); navInfo(cur - 2);
+}
+
+function submitTest() {
+  let sc = {s1:0,s2:0,s3:0,s4:0};
+  SECTIONS.forEach((sec,si) => {
+    const k = ['s1','s2','s3','s4'][si];
+    sec.questions.forEach((q,qi) => { if(answers[sec.id+'_'+qi]===q.ans) sc[k]++; });
+  });
+  const total = sc.s1+sc.s2+sc.s3+sc.s4;
+  const pct = Math.round(total/50*100);
+  const lvl = LEVELS.find(l => pct >= l.min && pct <= l.max);
+
+  document.getElementById('result-name').textContent = studentName.toUpperCase();
+  document.getElementById('a2-badge').style.display = total >= 35 ? 'block' : 'none';
+  document.getElementById('result-total').textContent = total;
+  document.getElementById('result-level').textContent = lvl.label;
+  document.getElementById('result-title').textContent = lvl.title;
+  document.getElementById('result-hint').textContent = lvl.hint;
+  document.getElementById('dm-title').textContent = 'Seni bekliyorum, ' + studentName.split(' ')[0] + '!';
+
+  let dmMsg;
+  if (total >= 35) {
+    dmMsg = 'A2 için hazırsın. 18 Nisan Cumartesi başlayan A2 seviye İspanyolca eğitimine katılmak istiyor musun? Kayıt işlemine devam etmek için DM gönder.';
+  } else if (total >= 30) {
+    dmMsg = 'Neredeyse A2 seviyesindesin ancak bazı konuları biraz daha geliştirmelisin. Sonraki adımlar için bana yaz, durumunu birlikte değerlendirelim.';
+  } else {
+    dmMsg = 'A1 seviyesinde bazı konuları daha pekiştirmen gerekiyor. A2 eğitimine hazır olman için sana yardımcı olabilirim. Sonraki adımlar için bana yaz, durumunu birlikte değerlendirelim.';
+  }
+  document.getElementById('dm-text').textContent = dmMsg;
+
+  function bar(id,bid,v,m){
+    document.getElementById(id).textContent=v+'/'+m;
+    document.getElementById(bid).style.width=Math.round(v/m*100)+'%';
+  }
+  bar('sc-gram','sc-gram-bar',sc.s1,12);
+  bar('sc-voc','sc-voc-bar',sc.s2,12);
+  bar('sc-comp','sc-comp-bar',sc.s3,13);
+  bar('sc-com','sc-com-bar',sc.s4,13);
+
+
+
+  // Kutlama bloğu — sadece 35+
+  const celDiv = document.getElementById('celebration');
+  celDiv.style.display = total >= 35 ? 'block' : 'none';
+
+  document.getElementById('copy-text').textContent =
+    'Merhaba! A1→A2 test sonucum ' + total + '/50. Bir sonraki adımlar hakkında bilgi almak istiyorum.';
+
+  show('screen-results');
+  document.getElementById('progress-bar').style.width='100%';
+}
+function copyDM(btn) {
+  const text = document.getElementById('copy-text').textContent;
+  navigator.clipboard.writeText(text).then(function() {
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 8l4 4 8-8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Kopyalandı!';
+    btn.classList.add('copied');
+    setTimeout(function() {
+      btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M3 11H2a1 1 0 01-1-1V2a1 1 0 011-1h8a1 1 0 011 1v1" stroke="currentColor" stroke-width="1.5"/></svg> Metni kopyala';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+</script>
+<footer class="site-footer">© 2026 Esracademia · Tüm hakları saklıdır.</footer>
+</body>
+</html>
